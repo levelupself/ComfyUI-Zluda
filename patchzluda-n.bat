@@ -12,14 +12,18 @@ rmdir /S /Q "venv\Lib\site-packages\torch" 2>nul
 echo :: Installing torch 2.7 - torchaudio 2.7 and torchvision 0.22
 pip install torch==2.7.0 torchvision==0.22.0 torchaudio==2.7.0 --index-url https://download.pytorch.org/whl/cu118 --quiet
 pip install numpy==1.26.4 --quiet
-rmdir /S /Q zluda 2>nul
-mkdir zluda
-cd zluda
-echo :: Downloading and patching zluda 3.9.5 nightly ...
-%SystemRoot%\system32\curl.exe -sL --ssl-no-revoke https://github.com/lshqqytiger/ZLUDA/releases/download/rel.5e717459179dc272b7d7d23391f0fad66c7459cf/ZLUDA-nightly-windows-rocm6-amd64.zip > zluda.zip
-%SystemRoot%\system32\tar.exe -xf zluda.zip
-del zluda.zip
-cd ..
+if not exist zluda\cublas.dll (
+    rmdir /S /Q zluda 2>nul
+    mkdir zluda
+    cd zluda
+    echo :: Downloading and patching zluda 3.9.5 nightly ...
+    %SystemRoot%\system32\curl.exe -sL --ssl-no-revoke https://github.com/lshqqytiger/ZLUDA/releases/download/rel.5e717459179dc272b7d7d23391f0fad66c7459cf/ZLUDA-nightly-windows-rocm6-amd64.zip > zluda.zip
+    %SystemRoot%\system32\tar.exe -xf zluda.zip
+    del zluda.zip
+    cd ..
+) else (
+    echo :: ZLUDA DLLs already present, skipping download ...
+)
 :: Patch DLLs
 copy zluda\cublas.dll venv\Lib\site-packages\torch\lib\cublas64_11.dll /y >NUL
 copy zluda\cusparse.dll venv\Lib\site-packages\torch\lib\cusparse64_11.dll /y >NUL

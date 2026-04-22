@@ -114,7 +114,12 @@ if %ERRLEVEL% neq 0 (
     exit /b %ERRLEVEL%
 )
 
-echo. 
+echo.
+echo  ::  %time:~0,8%  ::  - Adding Windows Defender exclusion for ZLUDA folder
+powershell -Command "Add-MpPreference -ExclusionPath '%~dp0zluda'" >NUL 2>&1
+echo  ::  %time:~0,8%  ::  - Defender exclusion added for: %~dp0zluda
+
+echo.
 echo  ::  %time:~0,8%  ::  - Patching ZLUDA
 :: Download ZLUDA version 3.9.5 nightly
 rmdir /S /Q zluda 2>nul
